@@ -24,6 +24,8 @@
 
 #include <controlVoltage.h>
 #include "MCP47FEB.h"
+#include "copernicus.h"
+#include <avr/interrupt.h>
 
 mcp47FEB dac(0x60);
 int dacOutput[] = {0,0};
@@ -36,29 +38,6 @@ controlVoltage trig1 = controlVoltage();
 controlVoltage trig2 = controlVoltage();
 
 const byte SERIAL_DEBUG = 0;
-
-byte cv1 = A0;
-byte cv2 = A1;
-
-byte pot[] = [A2,A3];
-int potRange[2] = {0,840};
-
-byte sw[2][2] = {
-  {4,7},
- {8,10}
-};
-
-byte seqTrig = 3;
-byte seqReset = 5;
-int seqVals[4][16];
-int seqNum = 0;
-
-//mux
-byte muxAdd[] = {12,1,11,13};
-byte muxIn = A7;
-byte muxOut = 11;
-
-byte led[] = {6,9};
 
 void setup() {
   if ( SERIAL_DEBUG) Serial.begin(115200);
@@ -96,6 +75,7 @@ byte muxReadEnable = 0;
 byte seqStep = 0;
 
 void loop() {
+
   env.loop();
   pitch.loop();
   
@@ -113,6 +93,11 @@ void loop() {
   static int stepOffset = 0;
 
   static int muxChannel = 0;
+
+  static int clockReceived = 0 ;
+  int trigReceived = 0;
+  static byte curStep = 0;
+  static byte trigCounter = 0;
 
 //read arduino inputs
   if(millis()-timer > interval){
@@ -152,7 +137,7 @@ void loop() {
   }//arduino inputs
 
   if(muxReadEnable == 1) readMuxInputs();
-  else if (muxReadEnable == 2) setMuxLED();
+  else if (muxReadEnable == 2) setMuxLED(curStep);
 
  
   /*CLOCK*/  
@@ -172,10 +157,7 @@ void loop() {
 //    }
 //  }
 
-  static int clockReceived = 0 ;
-  int trigReceived = 0;
-  static byte curStep = 0;
-  static byte trigCounter = 0;
+  
 
   for(int i=0;i<2;i++){
     if(prevTrigVal[i] != trigInput[i] && 
@@ -229,41 +211,4 @@ void loop() {
 
 void dacWrite(){
   dac.analogWrite(dacOutput[0],dacOutput[1]);
-}
-
-//read mux inputs at every clock input
-void readMuxInputs(){
-  static byte num = 0;
-  byte muxMap[] = {15,14,11,10,13,12,8,9,6,7,5,3,2,4,1,0};
-
-  if(num == 0) digitalWrite( muxOut, 0);
-
-  muxVals[seqNum] = analogRead( muxIn );
-
-  for(int j=0;j<4;j++){
-    //Serial.print(String((muxChannel>>j)&1) + " ");
-    digitalWrite(muxAdd[j], (muxMap[num]>>j)&1);
-  }
-
-  seqVals[num] = muxVals[num]; //to do: enable storing and recalling seqs
-
-  num++;
-
-  if(num>=16){
-    num = 0;
-    muxReadEnable = 2;
-  }
-}
-
-void setMuxLED(){
-  byte muxMap[] = {15,14,11,10,13,12,8,9,6,7,5,3,2,4,1,0};
-  
-  for(int j=0;j<4;j++){
-    //Serial.print(String((muxChannel>>j)&1) + " ");
-    digitalWrite(muxAdd[j], (muxMap[num]>>j)&1);
-  }
-
-  digitalWrite( muxOut, 1);
-  
-  muxReadEnable = 0;
 }
