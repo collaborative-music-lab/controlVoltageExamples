@@ -16,6 +16,8 @@ Mux analog Input: A6
 #include <controlVoltage.h>
 #include "MCP47FEB.h"
 
+const byte SERIAL_DEBUG = 0;
+
 mcp47FEB dac(0x60);
 int dacOutput[] = {0,0};
 
@@ -26,7 +28,6 @@ controlVoltage env2 = controlVoltage(10);
 controlVoltage trig1 = controlVoltage();
 controlVoltage trig2 = controlVoltage();
 
-const byte SERIAL_DEBUG = 0;
 
 byte cv1 = A0;
 byte cv2 = A1;
@@ -143,97 +144,95 @@ void loop() {
 
     if(swState[0] == 0) numSteps=0;
     else if(swState[0] == 1) numSteps=2;
-    else if(swState[1] == 2) numSteps=3;
+    else if(swState[0] == 2) numSteps=3;
 
 //    Serial.print(clockDivide);
 //    Serial.print(" ");
 //    Serial.println(numSteps);
 
-    digitalWrite(led[2], LOW);
+    digitalWrite(led[3], LOW);
   }//arduino inputs
 
  
   /*CLOCK*/  
-
+  //trigInput [0] = clock, [1] = reset
   static byte trigInput[2] = {1,1};
   static byte prevTrigVal[2] = {1,1};
-  
-  byte curTrig[2] = {0,0};
-  trigInput[0] = analogRead(A7)>200;
-  trigInput[1] = digitalRead(0);
-  
-//  for(int i=0;i<2;i++){
-//    if(trigInput[i] == 0){
-//      digitalWrite(led[i+2], HIGH);
-//      delay(100);
-//      digitalWrite(led[i+2], LOW);
-//    }
-//  }
 
+  trigInput[1] = analogRead(A7)>700;
+  trigInput[0] = digitalRead(0);
+  for(int i=0;i<2;i++) trigInput[i] = trigInput[i]==0; //invert inputs
+
+  //Serial.println("\t\t\t trigRaw " + String(trigInput[0]) + " " + String(trigInput[1]));
+  //delay(20);
+//  digitalWrite(led[3],trigInput[0]); //clock led
+//  digitalWrite(led[2],trigInput[1]); //reset led
+  
   static int clockReceived = 0 ;
-  int trigReceived = 0;
+  static int resetReceived = 0 ;
+  static int trigReceived = 0;
   static byte curStep = 0;
   static byte trigCounter = 0;
 
-  for(int i=0;i<2;i++){
-    if(prevTrigVal[i] != trigInput[i] && 
-      trigInput[i] == 1 &&
-      trigReceived == 0) {
-        trigReceived = 1;
-      }
-    prevTrigVal[i] = trigInput[i];
+//Serial.println("trig1 " + String(prevTrigVal[1]) + " " + String(trigInput[1]) + " " + String(resetReceived));
+  
+  if((prevTrigVal[1] == 0) && (trigInput[1] == 1) && (resetReceived==0)){
+    resetReceived = 1;
+    prevTrigVal[0] = 0;
+    trigReceived = 0;
+    if ( SERIAL_DEBUG)Serial.println("reset received");
   }
+  //Serial.println("trig0 " + String(prevTrigVal[0]) + " " + String(trigInput[0]) + " " + String(trigReceived));
+  if((prevTrigVal[0] == 0) && (trigInput[0] == 1) && (trigReceived==0)){
+    trigReceived = 1;
+    //Serial.println("trigger received");
+  }
+  for(int i=0;i<2;i++) prevTrigVal[i] = trigInput[i];
+ 
   if( trigInput[0] == 0 ) trigReceived = 0;
-  if( trigInput[1] == 0 ) trigCounter = 0;
 
   if(trigReceived) {
+    trigReceived = 0;
     trigCounter++;
-    if(trigCounter >= 64) trigCounter = 0;
-    //if(trigCounter % clockDivide[0] == 0) clockReceived[0] = 1;
-    if(trigCounter % clockDivide == 0) clockReceived = 1;
-}
-  
 
+    if(resetReceived==1){
+        resetReceived = 0;
+        trigCounter = 0;
+        curStep = 0;
+      }
+
+    if ( SERIAL_DEBUG) Serial.println("trigReceived " + String(trigCounter) );
+    if(trigCounter >= 64) trigCounter = 0;
+    if(trigCounter % clockDivide == 0) clockReceived = 1;
+    else clockReceived = 0;
+  }//trigReceived
   
   if(clockReceived == 1){
-    clockReceived = -1;
-  
-    /*clear LEDs first*/
-    digitalWrite(led[0], LOW);
-    digitalWrite(led[1], LOW);
-    
-    /*update step second*/
-    /*indicate if we are at step 1*/
-    if(curStep == 0) digitalWrite(led[3], HIGH);
-    else  digitalWrite(led[3],LOW);
-
+    clockReceived = 0;
+    if ( SERIAL_DEBUG) Serial.println("curStep " + String(curStep) + " offset " + String(stepOffset));
+     /*update clock LED*/
+    digitalWrite(led[3], HIGH);
 
     /*check current value for this step*/
     byte sumStep = (curStep + stepOffset) % 8;
+    /*indicate if we are at step 1*/
+    if(sumStep == 0) digitalWrite(led[2], HIGH);
+    else  digitalWrite(led[2],LOW);
+    
     byte hatStep = (sumStep + numSteps) % 8;
     byte kickVal = muxVals[sumStep*2]<200;
     byte hatVal = muxVals[hatStep*2+1]<200;
-    Serial.println("sum " + String(sumStep));
-    Serial.println("hat " + String(hatStep));
+    //Serial.println("sum " + String(sumStep) + " hat " + String(hatStep));
     
-    /*then write current step to LEDs*/
+    /*then write current step to output*/
     if(kickVal > 0){
       env1.AR(5,envDecay[0]);
-      digitalWrite(led[0], HIGH);
     }
     if(hatVal > 0){
       env2.AR(5,envDecay[1]);
-      digitalWrite(led[1], HIGH);
     }
-    
-    /*update clock LEDs*/
-    digitalWrite(led[2], HIGH);
-//    delay(5);
-//    digitalWrite(led[2], LOW);
-    digitalWrite(led[0], LOW);
-    digitalWrite(led[1], LOW);
 
-    if(curStep >= 7 )curStep = 0;
+    if(curStep >= 7 ) curStep = 0;
     else curStep += 1;
   }//clock received
 
@@ -242,13 +241,11 @@ void loop() {
   int signalInterval = 1;
   if( millis()-signalTimer >= signalInterval){
     signalTimer=millis();
-    
-    uint16_t env1Val = env1.get();
-    uint16_t env2Val = env2.get();
-
 
     dacOutput[0] =  env1.get() ;
     dacOutput[1] =  env2.get() ;
+    analogWrite(led[0], dacOutput[0]>>4);
+    analogWrite(led[1], dacOutput[1]>>4);
     
     dacWrite();
     
