@@ -1,6 +1,4 @@
 enum T8_Seqs {KICK, SNARE, CLAP, CHAT, OHAT, TOM, BASS, GLOBAL}; 
-//byte drum=0;
-const String T8_names[8] = {"KICK", "SNARE", "CLAP", "CHAT", "OHAT", "TOM", "BASS", "GLOBAL"};
 
 struct defT8{
   const byte bd = 36;

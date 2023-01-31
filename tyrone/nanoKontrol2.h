@@ -8,7 +8,7 @@ struct defMidiMsg{
 };
 
 struct defKorgNanokontrol2{
-  //to save space we just store the cc for the first of 8 elements
+  //to save memory we just store the cc for the first of 8 elements
 	 byte s1 = 32;
 	 byte m1 = 48;
 	 byte r1 = 64;
@@ -25,5 +25,5 @@ struct defKorgNanokontrol2{
 	 defMidiMsg cycle = {46, 0};
 	 defMidiMsg trackL = {58, 0};
 	 defMidiMsg trackR = {59, 0};
-  const byte transport[12] = {stop.val};
+   byte transport[12] = {stop.val};
 };

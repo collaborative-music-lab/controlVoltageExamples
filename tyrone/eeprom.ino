@@ -80,6 +80,7 @@ each slot begins at 0, 100, 200, etc? 10 slots available. . . .
   
   if( SERIAL_DEBUG ) Serial.println("Preset " + String(num) + " read");
   if( SERIAL_DEBUG ) Serial.println("recalled " + String(index - num*100) + " bytes");
+  cur_preset = num;
   lcd_printPreset();
  }
 

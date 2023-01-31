@@ -25,6 +25,8 @@ const byte SERIAL_DEBUG = 0;
  this example designed to use a korg nanoKontrol to sequence a Roland T8
 
   To do:
+ - !IMPORTANT: find a way to scale velocity range for each voice
+ - fix double triggering on longer clock divisoins (>4)
  - seq enable buttons in global mode should enable for changing subdivide - its wonky now
  - some unused buttons
  - lots of weird LED behaviour
@@ -33,6 +35,8 @@ const byte SERIAL_DEBUG = 0;
  - make the lowest pitch of the bass equal to the root (0) of the scale in Sequencer()
  - make repeat affect the previous beat (the one you just heard) rather than the upcoming beat
  - test preset storage. . .
+ - some way to clear a sequence?
+ - subdivide 3 actually generates [3,3,2] pattern. This might be worth fixing?
 
  6 drum, 1 bass, and 1 global channel
  Select channels using the 'R' buttons

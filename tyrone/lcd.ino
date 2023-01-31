@@ -34,13 +34,24 @@ void lcd_printNOTE(byte val){
 void lcd_printEnable(byte chan){
   lcd.setCursor(9,chan);
   for(int i=0;i<NUM_SEQS;i++){
-    if( (seqEnable[chan]>>i) & 1 ) lcd.write(49);
+    if( (seqEnable[chan]>>i) & 1 ) {
+//      switch(i){
+//        case 0: lcd.write('k'); break;
+//        case 1: lcd.write('s'); break;
+//        case 2: lcd.write('p'); break;
+//        case 3: lcd.write('c'); break;
+//        case 4: lcd.write('o'); break;
+//        case 5: lcd.write('t'); break;
+//        case 6: lcd.write('b'); break;
+//      }
+      lcd.write('*');
+    }
     else lcd.write(45);
   }
 }
 
 void lcd_printPreset(){
   lcd.setCursor(0,0);
-  lcd.write("P");
+  lcd.write('P');
   lcd.write(cur_preset + 48);
 }
