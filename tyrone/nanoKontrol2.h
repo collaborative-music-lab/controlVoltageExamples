@@ -25,5 +25,4 @@ struct defKorgNanokontrol2{
 	 defMidiMsg cycle = {46, 0};
 	 defMidiMsg trackL = {58, 0};
 	 defMidiMsg trackR = {59, 0};
-   byte transport[12] = {stop.val};
 };
