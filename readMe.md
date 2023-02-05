@@ -6,7 +6,8 @@ Files for creating Eurorack modules based on the controlVoltage repository: http
 Three examples so far:
 * 8-step trigger sequencer
 * Sloopy: dual slope generator
-* dual LFO
+* dual LFO (missing?)
+* Voxelist: Dual input quantizer
 
 ## Also examples of using USB Midi devices to generated sequences
 
