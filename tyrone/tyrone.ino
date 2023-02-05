@@ -12,7 +12,7 @@
 const byte clockPin = 2;
 const byte resetPin = 4;
 
-const byte SERIAL_DEBUG = 0;
+const byte SERIAL_DEBUG = 1;
 
 /*
  *******************************************************************************
