@@ -14,8 +14,6 @@ void clockLoop(){
   static byte clock_mode = 1; //0 for external, 1 for internal
   byte val = !digitalRead( clockPin );
   if(val == 1) clock_mode = 0;
-//  Serial.println(val); 
-//  delay(25);
   
   switch( clockState ){
     case bOFF: clockState = val == 1 ? bRISING : bFALLING; break;
@@ -36,27 +34,34 @@ void clockLoop(){
 
   /*****internal clock*****/
   static uint32_t control_timer = 0;
-  int interval = 500;
+  int interval = 450;
   
   if((millis()-control_timer > interval) && clock_mode > 0){
-    subdiv_interval = (millis()-control_timer)/(num_subdiv);
-    control_timer=millis();
+    //subdiv_interval = (millis()-control_timer)/(num_subdiv);
+    // control_timer=millis();
     
     clockState = bRISING;
-  } else clockState = bLOW;
+  } else if (clock_mode > 0) clockState = bLOW;
+
+  // Serial.println(clockState); 
+  // delay(25);
 
   /*****all clock*****/
+  static uint16_t subdiv_interval;
+
   if(clockState == bRISING) {
-//    subdiv_interval = (millis()-control_timer)/num_subdiv;
-//    control_timer=millis();
+    subdiv_interval = (millis()-control_timer)/num_subdiv;
+    control_timer=millis();
     
     subdiv = 1;
     Sequencer();
+     
      Serial.print("*");
-    
+      Serial.println(subdiv_interval);
   } else if(subdiv< num_subdiv){
-    if(millis()- subdiv_interval*subdiv > control_timer){
-      subdiv = subdiv < 254 ? subdiv+1 : 0;
+    if(millis() - control_timer > subdiv_interval){
+      control_timer=millis();
+      subdiv = subdiv < 255 ? subdiv+1 : 0;
       Sequencer();
       //Serial.print(" subdiv" + String( subdiv ));
     }

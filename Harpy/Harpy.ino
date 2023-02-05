@@ -7,7 +7,7 @@
 #include "launchkey.h"
 #include "niftyCase.h"
 
-const byte SERIAL_DEBUG = 0;
+const byte SERIAL_DEBUG = 1;
 
 const byte clockPin = 2;
 const byte resetPin = 4;
@@ -101,7 +101,6 @@ byte globalRepeat = 0;
 
 //clock parameters
 //subdiv multiples clock input
-uint16_t subdiv_interval;
 uint8_t subdiv = 0;
 uint8_t num_subdiv = 4; //must be 1 or greater
 
@@ -144,7 +143,7 @@ void setup()
   pinMode(7, OUTPUT);
   digitalWrite(7,HIGH);
   
-  Serial.begin(115200);
+  if (SERIAL_DEBUG) Serial.begin(115200);
 
   MIDI.begin(31250);
 
@@ -171,7 +170,6 @@ void setup()
   //LCD
   lcd.init();                      // initialize the lcd 
   lcd.backlight();
-  Serial.begin(115200);
 //  for(int i=0;i<8;i++) lcd.createChar(i+1 , customchar[i]);
 //  lcd.print("midi sequencer");  
 

@@ -3,21 +3,6 @@ typedef struct defCCMsg{
   byte val;
 };
 
-defCCMsg ccMsg[10] = {
-  {"Start"}, {"End"}, {"transpose"}, {"length"}
-};
-
-
-//ccMsgs[0] = "Start";
-//ccMsgs[1] = "End";
-//ccMsgs[2] = "transpose";
-//ccMsgs[3] = "length";
-//ccMsgs[4] = "choke";
-//ccMsgs[5] = "tempo";
-//ccMsgs[6] = "none";
-//ccMsgs[7] = "none";
-//ccMsgs[8] = "none";
-
 void setupCC(){
   //ccMsg[0].name = "Start";
 }
@@ -28,18 +13,8 @@ void processCC(byte num, byte val){
 //  lcd.print( ccMsg[num-20] .name + " ");
   if(num == key.mod.num) handleModWheel(val);
   else if(num >= key.trackR.num) handleButtons(num, val);
-  else if(num >= key.dial1 && num < key.dial1 + 8){
-  
-//    switch(num){
-//      case 0: seqStart = val / (128/seqLength); lcd.print( String(seqStart)) ; break;
-//      case 1: seqEnd = val / (128/seqLength); lcd.print( String(seqEnd)) ; break;
-//      case 2: transpose = ((int)val-64) / 9; lcd.print( String(transpose)) ; break;
-//      case 3: curLength = val/16 + 1; lcd.print( String(curLength)) ; break;
-//      case 23: minChoke = (127-val) + 0; lcd.print( String(minChoke)) ; break;
-//      case 24: tempo = (val*val/30) + 20; lcd.print( String(tempo)) ; break;
-//      //case 27: gateMode = val/35; break;
-//    }
-  } else handleButtons(num, val);
+  else if(num >= key.dial1 && num < key.dial1 + 8) handleDials(num,val);
+  else handleButtons(num, val);
 //  byte pad = 10;
 //  pad = pad - (sizeof(ccMsg[num-20].name));
 //  while(pad > 2) {
@@ -58,6 +33,15 @@ void handleButtons(byte num, byte val){
     if(val>0) cur_chan = key.arrow.val > 0 ? 3 : 2;
     Serial.println("chan " + String(cur_chan));
   }
+}
+
+void handleDials(byte num, byte val){
+  num = num - key.dial1;
+   switch(num){
+     case 0: seqDivide[0] = val/8 + 1; lcd.setCursor(15,0); lcd.write( seqDivide[0]+48) ; break;
+     case 4: seqDivide[1] = val/8 + 1; lcd.setCursor(15,1); lcd.write( seqDivide[1]+48) ; break;
+   }
+  
 }
 
 void handlePads(byte num){

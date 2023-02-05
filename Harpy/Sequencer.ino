@@ -55,11 +55,11 @@ void Sequencer(){
     //update lcd for previous step
     //indicate index
     lcd_show_index(i, indexA);
-    if(i==0){
+    if(i==0 && ledIndexA != indexA){
       lcdShowActiveStep(i, ledIndexA);
       ledIndexA = indexA;
     }
-    else if(i==1){
+    else if(i==1 && ledIndexB != indexB){
       lcdShowActiveStep(i, ledIndexB);
       ledIndexB = indexA;
     }
