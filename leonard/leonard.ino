@@ -14,6 +14,7 @@ const byte clockPin = 2;
 const byte resetPin = 4;
 
 const byte SERIAL_DEBUG = 1;
+uint32_t test_timer = 0;
 
 /*
  *******************************************************************************

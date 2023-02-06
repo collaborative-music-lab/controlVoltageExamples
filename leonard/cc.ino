@@ -10,6 +10,7 @@ void handleCtlY(byte num, byte val){
   lp.ctlY[num].val = val;
   if(num>3 && val>0) {
     updatePatternSelect(num-4);
+    num_subdiv = num-3;
   }
   else {
     processGlobalMsgs(num,val);

@@ -17,10 +17,10 @@ https://docs.arduino.cc/learn/built-in-libraries/eeprom
  }
 
  void readPreset(byte num){
-   if(num == cur_preset){
-     updateGrid();
-     return 0;
-   }
+  //  if(num == cur_preset){
+  //    updateGrid();
+  //    return 0;
+  //  }
 
    int address = num < 20 ? num * 50 : 950;
    EEPROM.get( address, params );
@@ -42,4 +42,10 @@ https://docs.arduino.cc/learn/built-in-libraries/eeprom
 
    Serial.print( address + sizeof(params) + sizeof(seq[0].val) + sizeof(seq[0]._aux))  ;
   Serial.println("written to " + String(address));
+
+  //update preset led
+  USBmessage(lp.CC, cur_preset + lp.ctlX[0].num,  0);
+  cur_preset = num;
+  USBmessage(lp.CC, cur_preset + lp.ctlX[0].num,  51);
+
  }

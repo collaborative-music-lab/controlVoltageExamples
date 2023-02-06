@@ -43,7 +43,7 @@ void clockLoop(){
     clockState = bRISING;
   } else if (clock_mode > 0) clockState = bLOW;
 
-  // Serial.println(clockState); 
+  // Serial.println(millis()); 
   // delay(25);
 
   /*****all clock*****/
@@ -53,6 +53,8 @@ void clockLoop(){
   if(clockState == bRISING) {
     subdiv_interval = (millis()-control_timer)/num_subdiv;
     control_timer=millis();
+    // Serial.println(millis()-test_timer); 
+    // test_timer = millis();
     
     subdiv = 1;
     Sequencer();

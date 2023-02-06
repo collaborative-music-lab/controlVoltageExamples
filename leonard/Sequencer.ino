@@ -29,7 +29,10 @@ void Sequencer(){
 
         if(val[i] > 0) {
           MIDImessage( nifty.DRUM_ON, i*12 + 36, 100 );
-          scheduleNoteOff( i*12 + 36, 5);  
+          scheduleNoteOff( i*12 + 36, 5); 
+          // Serial.print(i); 
+          // Serial.print(" "); 
+          // Serial.println(millis()-test_timer);
         } 
       }//divide
     }//enable
