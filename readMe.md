@@ -5,8 +5,9 @@ Files for creating Eurorack modules based on the controlVoltage repository: http
 ### Standard examples
 Three examples so far:
 * 8-step trigger sequencer
-* dual slope generator
-* dual LFO
+* Sloopy: dual slope generator
+* dual LFO (missing?)
+* Voxelist: Dual input quantizer
 
 ## Also examples of using USB Midi devices to generated sequences
 
@@ -20,6 +21,7 @@ EXCEPT: Control Voltage needs most recent version from Github
 	* https://github.com/marcoschwartz/LiquidCrystal_I2C.git
 3. Control Voltage library
 	* https://github.com/ianhattwick/controlVoltage
+4. Standard EEPROM library
 
 ### examples
 1. Harpy - Launchkey controlling NiftyCase with melodic voice
