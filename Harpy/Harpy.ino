@@ -81,7 +81,7 @@ Sequencer8bit<SEQ_LENGTH> seq[2];
 
 byte seqEnable = 3; //bits control enable
 
-byte cur_chan = 0;
+byte cur_chan = 1;
 byte keys_down = 0;
 byte cur_note = 60;
 byte cur_note_prev = 60; //might be interesting to keep track of last two notes pressed?
@@ -154,36 +154,27 @@ void setup()
 
   // Register onInit() function
   Midi.attachOnInit(onInit);
-//
-//  for(int i=0;i<seqLength;i++){
-//      sequence[i] = 36;
-//      chokeSeq[i] = 0;
-//      lengthSeq[i] = 1;
-//      gateSeq[i] = 1;
-//
-//      seqA.set(i,36);
-//      seqB.set(i,36);
-//      seqC.set(i,36);
-//      seqD.set(i,36);
-//  }
 
   //LCD
   lcd.init();                      // initialize the lcd 
   lcd.backlight();
-//  for(int i=0;i<8;i++) lcd.createChar(i+1 , customchar[i]);
-//  lcd.print("midi sequencer");  
 
   //scanI2C();
+
+  for(byte i=0;i<SEQ_LENGTH;i++){
+    seq[0].setAux(0, i, 1 );
+    //seq[1].setAux(0, i, 1 );
+  }
 
 }
 
 void loop()
 {
   //chan2.loop(); 
-  //Sequencer();
   Usb.Task();
   if ( Midi ) {
     MIDI_poll();
   }
   clockLoop();
+  processNoteOff();
 }

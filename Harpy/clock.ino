@@ -14,7 +14,7 @@ void clockLoop(){
   static byte clock_mode = 1; //0 for external, 1 for internal
   byte val = !digitalRead( clockPin );
   if(val == 1) clock_mode = 0;
-  
+
   switch( clockState ){
     case bOFF: clockState = val == 1 ? bRISING : bFALLING; break;
     case bLOW: clockState = val == 1 ? bRISING : bLOW; break;
@@ -43,27 +43,33 @@ void clockLoop(){
     clockState = bRISING;
   } else if (clock_mode > 0) clockState = bLOW;
 
-  // Serial.println(clockState); 
+  // Serial.println(millis()); 
   // delay(25);
 
   /*****all clock*****/
   static uint16_t subdiv_interval;
+  static uint32_t prevClock = millis();
 
   if(clockState == bRISING) {
     subdiv_interval = (millis()-control_timer)/num_subdiv;
     control_timer=millis();
+    // Serial.println(millis()-test_timer); 
+    // test_timer = millis();
     
     subdiv = 1;
     Sequencer();
+    //  static byte pitch = 0;
+    // MIDImessage( nifty.DRUM_ON, 36+pitch*12, 0 ); 
+    // pitch = pitch>3?0:pitch+1;
+    // MIDImessage( nifty.DRUM_ON, 36+pitch*12, 100 );
      
-     Serial.print("*");
-      Serial.println(subdiv_interval);
+    Serial.print("*");
+    //Serial.println(subdiv_interval);
   } else if(subdiv< num_subdiv){
-    if(millis() - control_timer > subdiv_interval){
-      control_timer=millis();
-      subdiv = subdiv < 255 ? subdiv+1 : 0;
+    if(millis() - control_timer > subdiv_interval*subdiv){
+      subdiv = subdiv+1;
       Sequencer();
-      //Serial.print(" subdiv" + String( subdiv ));
+      Serial.print(".");
     }
   }
 

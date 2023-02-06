@@ -29,7 +29,7 @@ void Sequencer(){
 
         if(val[i] > 0) {
           MIDImessage( nifty.DRUM_ON, i*12 + 36, 100 );
-          scheduleNoteOff( i*12 + 36, 5); 
+          scheduleNoteOff( nifty.DRUM_ON, i*12 + 36, 0, 5); 
           // Serial.print(i); 
           // Serial.print(" "); 
           // Serial.println(millis()-test_timer);
@@ -57,26 +57,30 @@ uint32_t gateLength[8];
 byte gateWrite = 0;
 byte gateRead = 7;
 
-void scheduleNoteOff(byte num, byte val){ //note number, delay time
+void scheduleNoteOff(byte i, byte num, byte val, byte delay){ //channel note number, delay time
   byte newGateWrite = (gateWrite+1)%8;
   if (newGateWrite != gateRead){
-    gateArray[gateWrite] = num;
-    gateLength[gateWrite] = millis()+val;
-    gateWrite = (gateWrite+1)%8;
+    gateDelay[gateWrite].status =i;
+    gateDelay[gateWrite].num = num;
+    gateDelay[gateWrite].val= val;
+    gateDelay[gateWrite].time = millis()+delay;
+    gateWrite = newGateWrite;
   } else {
-    MIDImessage( nifty.DRUM_ON, gateArray[gateRead], 0 ); 
+    MIDImessage( gateDelay[gateRead].status, gateDelay[gateRead].num, gateDelay[gateRead].val ); 
     gateRead = (gateRead+1)%8;
 
-    gateArray[gateWrite] = num;
-    gateLength[gateWrite] = millis()+val;
-    gateWrite = (gateWrite+1)%8;
+    gateDelay[gateWrite].status =i;
+    gateDelay[gateWrite].num = num;
+    gateDelay[gateWrite].val= val;
+    gateDelay[gateWrite].time = millis()+delay;
+    gateWrite = newGateWrite;
   }
 }
 
 void processNoteOff(){
   if ( gateRead != gateWrite ){
-    if( millis() > gateLength[gateRead]) {
-      MIDImessage( nifty.DRUM_ON, gateArray[gateRead], 0 ); 
+    if( millis() > gateDelay[gateRead].time) {
+      MIDImessage( gateDelay[gateRead].status, gateDelay[gateRead].num, gateDelay[gateRead].val ); 
       gateRead = (gateRead+1) % 8; 
       processNoteOff();
     }

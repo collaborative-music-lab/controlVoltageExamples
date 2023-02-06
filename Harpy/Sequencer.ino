@@ -31,7 +31,7 @@ void Sequencer(){
      //check for a key being pressed and write curNote into current sequence
      if(keys_down > 0){
       if((cur_chan>>i) & 1) seq[i].set(indexA,cur_note-36);
-      Serial.println(cur_note);
+      //Serial.println(cur_note);
      }
 //    
 //    //check if a step is active
@@ -44,9 +44,8 @@ void Sequencer(){
     if(valA > 0 ) {
       //MIDImessage( nifty.NOTE_ON[i], seq[i].get(ledIndexA), 0 );
       MIDImessage( nifty.NOTE_ON[i], seq[i].get(indexA), 127 );
-      delay(5);
-      MIDImessage( nifty.NOTE_ON[i], seq[i].get(indexA), 0 );
-      prev_note[i] = seq[i].get(indexA);
+      scheduleNoteOff( nifty.NOTE_ON[i], seq[i].get(indexA), 0, 5); 
+      //prev_note[i] = seq[i].get(indexA);
     } else if(prev_note[i] > 0) {
 //      MIDImessage( nifty.NOTE_ON[i],prev_note[i], 0 );
 //      prev_note[i] == 0;
@@ -63,104 +62,47 @@ void Sequencer(){
       lcdShowActiveStep(i, ledIndexB);
       ledIndexB = indexA;
     }
-//
-//    //get the max velocity between seq A & B
-//    if(i<6){
-//      //for drums
-//      byte vel = valA > 0 ? seq[i].get(0) : 0;
-//      if( (valB > 0) && (seq[i].get(1) > vel)) vel = seq[i].get(1);
-//      if( vel>0 ) MIDImessage( t8.noteON, t8.seq[i], vel>1?vel:0 );
-//    }
-//    else if ( i==6 ){
-//      //for synth
-//      byte vel = valA > 0 ? bassGain[0] : 0;
-//      if( (valB > 0) && (bassGain[1] > vel)) vel = bassGain[1];
-//      
-//      if(vel >0) {
-//        //calculate pitch
-//        const byte scale[] = {0,2,3,5,7,8,10};
-//        MIDImessage( bassON, curNote, 0 );
-//  
-//        byte pitch = 0;
-//        if(seq[i].getAux(0,indexA) == 1) pitch += (seq[6].get(indexA)/18 + 1);
-//        if(seq[i].getAux(1,indexB) == 1) pitch += (seq[6].get(indexB)/18 + 1);
-//        curNote = scale[pitch % sizeof(scale)] + (pitch / sizeof(scale))*12 + pitchOffset;
-//  
-//        MIDImessage( bassON, curNote, vel>1?vel:0 );    
-//        lcd_printNOTE(curNote);
-//      }
-//    }
-//
-//    //light up sequence position
-//    if(i==drum){
-//      USBmessage(ccMSG, nano.s1 + indexA, 127);
-//      USBmessage(ccMSG, nano.m1 + indexB, 127);
-//      ledIndexA = indexA;
-//      ledIndexB = indexB;
-//    }
+
+  }
+}
+/**************process note offs**********/
+struct defMidiPacketDelay{
+  byte status;
+  byte num;
+  byte val;
+  uint32_t time;
+};
+defMidiPacketDelay gateDelay[8];
+
+byte gateWrite = 0;
+byte gateRead = 0;
+
+void scheduleNoteOff(byte i, byte num, byte val, byte delay){ //channel note number, delay time
+  byte newGateWrite = (gateWrite+1)%8;
+  if (newGateWrite != gateRead){
+    gateDelay[gateWrite].status =i;
+    gateDelay[gateWrite].num = num;
+    gateDelay[gateWrite].val= val;
+    gateDelay[gateWrite].time = millis()+delay;
+    gateWrite = newGateWrite;
+  } else {
+    MIDImessage( gateDelay[gateRead].status, gateDelay[gateRead].num, gateDelay[gateRead].val ); 
+    gateRead = (gateRead+1)%8;
+
+    gateDelay[gateWrite].status =i;
+    gateDelay[gateWrite].num = num;
+    gateDelay[gateWrite].val= val;
+    gateDelay[gateWrite].time = millis()+delay;
+    gateWrite = newGateWrite;
   }
 }
 
-/**************************************************************************************/
-//void Sequencer(){
-//  static uint32_t controlTimer = 0;
-//  int interval = 150;
-//
-//  static int val= 0;
-//  static int index=0;
-//  static byte scalePitches[] = {0,0,1,1,2,3,3,4,4,5,5,6,6};
-//  static byte scale[]={0,2,4,5,7,9,11};
-//  static int octave = 0;
-//  static int curVal = 36;
-//  static uint32_t prev_pulse = 0;
-//  
-//  if(prev_pulse != pulses){
-//    controlTimer=millis();
-//    static uint16_t prevTrigger = 0;
-//     index = pulses;
-//
-//    byte trigger = pulses - prevTrigger >= lengthSeq[index];
-//
-//    if( trigger == 0 && gateSeq[index] >= 1) MIDImessage(noteOFF, curVal, 0);
-//    if( trigger == 0 && gateSeq[index] == 1)  MIDImessage(noteON, curVal, 127 - chokeSeq[index]*minChoke);
-//    if( trigger > 0 ) {
-//      prevTrigger = pulses;
-//      MIDImessage(noteOFF, curVal, 0);
-//    
-//      byte seqDirection = seqStart < seqEnd;
-//  
-//      if(seqDirection){
-//        index = index >= seqEnd ? seqStart : index<seqStart ? seqStart : index+1;
-//      } else index = index <= seqEnd ? seqStart : index > seqStart ? seqStart : index-1;
-//  
-//      if(keyDown > 0) {
-//        if( cur_note % 12 != 6) {
-//          sequence[index] = cur_note-24;
-//          chokeSeq[index] = choke;
-//          lengthSeq[index] = curLength;
-//          gateSeq[index] = gateMode;
-//        }
-//      }
-//      curVal = sequence[index];
-//      if(curVal % 12 != 10){
-//        curVal = scalePitches[curVal % 12] + (curVal/12)*sizeof(scale) + transpose;
-//        byte curOctave = curVal/sizeof(scale);
-//        curVal = scale[curVal % sizeof(scale)] + (octave+curOctave)*12;
-//        MIDImessage(noteON, curVal, 127 - chokeSeq[index]*minChoke);
-//        //Serial.println( "gate " + String(gateSeq[index]));
-//        lcd.clear();
-//        lcd.setCursor(0,0);
-//        lcd.print("A:" + String(curVal));
-//        lcd.setCursor(0,1);
-//        lcd.print("B:" + String(60));
-//
-//        lcd.setCursor(15,0);
-//        lcd.print( String(pulses) );
-//      }
-//      
-//    }//control loop
-//    
-//    prev_pulse = pulses ;
-//    //pulses++;
-//  }//timer
-//}
+void processNoteOff(){
+  if ( gateRead != gateWrite ){
+    if( millis() > gateDelay[gateRead].time) {
+      MIDImessage( gateDelay[gateRead].status, gateDelay[gateRead].num, gateDelay[gateRead].val ); 
+      gateRead = (gateRead+1) % 8; 
+      processNoteOff();
+    }
+  }
+}

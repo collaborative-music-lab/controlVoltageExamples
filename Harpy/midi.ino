@@ -20,7 +20,7 @@ void MIDI_poll()
       if(bufMidi[2] >= key.pad1) handlePads(bufMidi[2]); //in cc tab
     } 
     else if( bufMidi[1] == 128 ){ //note off
-      //sprintf(buf, " %s %d %d %d", "NOTEOFF 1", bufMidi[1],bufMidi[2], bufMidi[0]);
+      sprintf(buf, " %s %d %d %d", "NOTEOFF 1", bufMidi[1],bufMidi[2], bufMidi[0]);
       keys_down = keys_down > 0 ? keys_down - 1: 0;
       Serial.println(keys_down);
     } 
