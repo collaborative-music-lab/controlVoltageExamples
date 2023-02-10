@@ -11,10 +11,10 @@ void clockSetup(){
 
 void clockLoop(){
   /*****external clock*****/
+  static byte clock_mode = 1; //0 for external, 1 for internal
   byte val = !digitalRead( clockPin );
-//  Serial.println(val); 
-//  delay(25);
-  
+  if(val == 1) clock_mode = 0;
+
   switch( clockState ){
     case bOFF: clockState = val == 1 ? bRISING : bFALLING; break;
     case bLOW: clockState = val == 1 ? bRISING : bLOW; break;
@@ -34,29 +34,42 @@ void clockLoop(){
 
   /*****internal clock*****/
   static uint32_t control_timer = 0;
-  int interval = 500;
+  int interval = 450;
   
-  if(millis()-control_timer > interval){
-    subdiv_interval = (millis()-control_timer)/(num_subdiv);
-    control_timer=millis();
+  if((millis()-control_timer > interval) && clock_mode > 0){
+    //subdiv_interval = (millis()-control_timer)/(num_subdiv);
+    // control_timer=millis();
     
     clockState = bRISING;
-  } else clockState = bLOW;
+  } else if (clock_mode > 0) clockState = bLOW;
+
+  // Serial.println(millis()); 
+  // delay(25);
 
   /*****all clock*****/
+  static uint16_t subdiv_interval;
+  static uint32_t prevClock = millis();
+
   if(clockState == bRISING) {
-//    subdiv_interval = (millis()-control_timer)/num_subdiv;
-//    control_timer=millis();
+    subdiv_interval = (millis()-control_timer)/num_subdiv;
+    control_timer=millis();
+    // Serial.println(millis()-test_timer); 
+    // test_timer = millis();
     
     subdiv = 1;
     Sequencer();
-    if( SERIAL_DEBUG ) Serial.print("*");
-    
+    //  static byte pitch = 0;
+    // MIDImessage( nifty.DRUM_ON, 36+pitch*12, 0 ); 
+    // pitch = pitch>3?0:pitch+1;
+    // MIDImessage( nifty.DRUM_ON, 36+pitch*12, 100 );
+     
+    Serial.print("*");
+    //Serial.println(subdiv_interval);
   } else if(subdiv< num_subdiv){
-    if(millis()- subdiv_interval*subdiv > control_timer){
-      subdiv = subdiv < 254 ? subdiv+1 : 0;
+    if(millis() - control_timer > subdiv_interval*subdiv){
+      subdiv = subdiv+1;
       Sequencer();
-      //Serial.print(" subdiv" + String( subdiv ));
+      Serial.print(".");
     }
   }
 

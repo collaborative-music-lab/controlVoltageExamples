@@ -30,7 +30,7 @@ void MIDImessage(int command, int MIDInote, int MIDIvelocity) {
   MIDI.write(command);//send note on or note off command 
   MIDI.write(MIDInote);//send pitch data
   MIDI.write(MIDIvelocity);//send velocity data
-  //Serial.println("Midi " + String(command) + " " + String(MIDInote) + " " + String(MIDIvelocity));
+  Serial.println("Midi " + String(command) + " " + String(MIDInote) + " " + String(MIDIvelocity));
 }
 
 void USBmessage(byte command, byte MIDInote, byte MIDIvelocity){
