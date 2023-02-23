@@ -22,6 +22,7 @@ void Sequencer(){
 //
 //  //calculate sequences for both voices
   for(byte i=0;i<2;i++){
+    USBmessage2(key.LED, key.pad1+key.padOffset[cur_index%16], cur_index%120);
      byte indexA = 0;
      byte indexB = 0;
 
@@ -66,6 +67,7 @@ void Sequencer(){
   }
 }
 /**************process note offs**********/
+/**************process note offs**********/
 struct defMidiPacketDelay{
   byte status;
   byte num;
@@ -77,31 +79,47 @@ defMidiPacketDelay gateDelay[8];
 byte gateWrite = 0;
 byte gateRead = 0;
 
-void scheduleNoteOff(byte i, byte num, byte val, byte delay){ //channel note number, delay time
+void scheduleNoteOff(byte i, byte num, byte val, int delay){ //channel note number, delay time
   byte newGateWrite = (gateWrite+1)%8;
   if (newGateWrite != gateRead){
     gateDelay[gateWrite].status =i;
     gateDelay[gateWrite].num = num;
     gateDelay[gateWrite].val= val;
-    gateDelay[gateWrite].time = millis()+delay;
-    gateWrite = newGateWrite;
+    gateDelay[gateWrite].time = delay>5 ? millis()+delay : millis() + 5;
   } else {
+    Serial.println("double");
     MIDImessage( gateDelay[gateRead].status, gateDelay[gateRead].num, gateDelay[gateRead].val ); 
     gateRead = (gateRead+1)%8;
 
     gateDelay[gateWrite].status =i;
     gateDelay[gateWrite].num = num;
     gateDelay[gateWrite].val= val;
-    gateDelay[gateWrite].time = millis()+delay;
-    gateWrite = newGateWrite;
+    gateDelay[gateWrite].time = delay>5 ? millis()+delay : millis() + 5;
   }
+  // Serial.print(gateWrite);
+  // Serial.print(" on ");
+  // Serial.print(num);
+  // Serial.print("  ");
+  // Serial.println(delay);
+  // Serial.print(gateDelay[gateWrite].time);
+  // Serial.print("  ");
+  // Serial.println(millis());
+
+  gateWrite = newGateWrite;
 }
 
 void processNoteOff(){
   if ( gateRead != gateWrite ){
     if( millis() > gateDelay[gateRead].time) {
       MIDImessage( gateDelay[gateRead].status, gateDelay[gateRead].num, gateDelay[gateRead].val ); 
-      gateRead = (gateRead+1) % 8; 
+     
+      // Serial.print(gateRead);
+      // Serial.print(" off ");
+      // Serial.print(gateDelay[gateRead].num);
+      // Serial.print("  ");
+      // Serial.println(gateDelay[gateRead].time);
+
+      gateRead = (gateRead+1) % 8;
       processNoteOff();
     }
   }

@@ -2,6 +2,7 @@
 #include <SoftwareSerial.h>
 #include <Wire.h> 
 #include <Mini_LiquidCrystal_I2C.h>
+//#include <LiquidCrystal_I2C_Hangul.h>
 #include <usbh_midi.h>
 #include <usbhub.h>
 #include <controlVoltage.h>
@@ -108,6 +109,8 @@ Ardunio pinout (verify):
 
 //LCD Display
 Mini_LiquidCrystal_I2C lcd(0x3F,16,2);  // set the LCD address to 0x27 for a 16 chars and 2 line display
+//Mini_LiquidCrystal_I2C lcd(0x27,16,2);  // set the LCD address to 0x27 for a 16 chars and 2 line display
+//LiquidCrystal_I2C_Hangul lcd(0x3F,16,2); 
 
 const byte NUM_SEQS = 7;
 const byte SEQ_LENGTH = 8;

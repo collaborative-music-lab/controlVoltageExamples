@@ -116,7 +116,7 @@ void loop() {
     /*CV*/
     int cvVal1 = map(analogRead(cv1), 0, 800, 0, 1023);
     cvVal1 = constrain(cvVal1,0,1012);
-    //Serial.println("cv " + String(cvVal1) + " " + String(cvVal2) );
+    Serial.println("cv " + String(cvVal1) + " " + String(cvVal1) );
     float env2scalar = (float)cvVal1/1023 + 0.01;
 
     /*SWITCHES*/
@@ -133,6 +133,9 @@ void loop() {
     else if(swState[0] == 1) slopeTime = 8;
     else if(swState[0] == 2) slopeTime = 8;
 
+    Serial.println( "sw " + String(0) + " " + String(swState[0]));
+    Serial.println( "sw " + String(1) + " " + String(swState[1]));
+
     if( swState[0] == 2) {env1.cycle = 1; env2.cycle = 1;}
     else { env1.cycle = 0; env2.cycle = 0;}
 
@@ -140,10 +143,12 @@ void loop() {
     for(int i=0;i<2;i++){
       potVal[i] = map(analogRead(potPin[i]), potRange[0],potRange[1],0,1023);
       potVal[i] = 1023 - constrain(potVal[i],0,1023);
-      //Serial.println( String(potVal[i]));
+      Serial.print( "pot" + String(potVal[i]));
       //if(potVal[i] > 100) 
         //potVal[i] = ((pow((float(potVal[i]-50))/923.,1.5)))* 1900 + 50;
     }
+    Serial.println();
+
     riseTime = potVal[0] * slopeTime;
     fallTime = potVal[1]*2 * slopeTime;
     env1.riseTime( riseTime);
@@ -160,8 +165,8 @@ void loop() {
     //Serial.println( String(swState[0]) + " " + String(swState[1]));
    // Serial.println( String(slopeTime) + " " + String(swState[1]));
  
-//   Serial.println( String(fallTime) + " " + String(fallTime2));
-//   Serial.println( String(riseTime) + " " + String(riseTime2));
+  Serial.println( String(fallTime) + " " + String(fallTime2));
+  Serial.println( String(riseTime) + " " + String(riseTime2));
 //   Serial.println();
   }//arduino inputs
 
@@ -183,14 +188,12 @@ void loop() {
   else trigReceived = 0;
 
   prevTrig = trigInput;
-  
 
-
-  if(trigReceived) {
+  if(trigReceived > 0) {
     digitalWrite(9,HIGH);
     trigLedTimer = millis();
     trigLedState = 1;;
-    //Serial.println("trig");
+    Serial.println("trig");
     env1.AR(riseTime,fallTime);
     env2.AR(riseTime2, fallTime2);
   }

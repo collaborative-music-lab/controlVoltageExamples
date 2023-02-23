@@ -28,6 +28,10 @@ uint32_t test_timer = 0;
  - e.g. midi channel 10 to niftcase turns the 5 outputs into trigger outputs
  - maybe it could be 4 trigger outputs on channel 10, plus mod out on channel 1?
 
+ v1.0 initial
+ v2.0:
+ - added buffering for LED msgs
+
   To do:
  - update LED updates for enable, divide, and patternSquence (top 4 rows) when preset is changed
   - maybe make an LED update queue so it doesn't miss so many updates?
@@ -100,6 +104,8 @@ Ardunio pinout (verify):
  *******************************************************************************
  */
 
+ char version_num[] = "v. 2.0";
+
 
 //const char deviceVendor[] = {"korg"};
 //const char midiDevice[2] = {"nanoKey", "nanoKontrol2"};
@@ -138,6 +144,7 @@ void onInit()
     }
   }
   lcd_string("leonard seq",0, 0);
+  lcd_string(version_num,0, 1);
 }//usb init
 
 void setup()
@@ -196,6 +203,7 @@ void loop()
     MIDI_poll();
   }
   clockLoop();
+  processLED();
   //modOutput();
   //looptimer();
 }

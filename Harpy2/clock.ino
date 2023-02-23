@@ -34,7 +34,7 @@ void clockLoop(){
 
   /*****internal clock*****/
   static uint32_t control_timer = 0;
-  int interval = 150;
+  int interval = 450;
   
   if((millis()-control_timer > interval) && clock_mode > 0){
     //subdiv_interval = (millis()-control_timer)/(num_subdiv);
@@ -51,8 +51,7 @@ void clockLoop(){
   static uint32_t prevClock = millis();
 
   if(clockState == bRISING) {
-    beat_length = millis()-control_timer;
-    subdiv_interval = beat_length/num_subdiv;
+    subdiv_interval = (millis()-control_timer)/num_subdiv;
     control_timer=millis();
     // Serial.println(millis()-test_timer); 
     // test_timer = millis();

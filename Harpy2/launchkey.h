@@ -15,7 +15,11 @@ struct defMidiMsg{
   byte val;
 };
 
-enum LK_BUTTONS = {}
+enum LK_BUTTONS {PAD, A, B, REC, PLAY, SHIFT};
+enum LK_COLOR {OFF, WHITE, RED, GREEN, BLUE, ORANGE, PINK, PURPLE};
+enum LK_FLASH {ON, BLINK, PULSE2};
+
+const byte lk_color[] = {0, 3, 5, 17, 45, 9, 53, 44};
 
 struct defLaunchkey{
   //to save memory we just store the cc for the first of 8 elements
@@ -33,6 +37,7 @@ struct defLaunchkey{
 	 defMidiMsg arrow = {104, 0};
    defMidiMsg trackL = {103, 0};
    defMidiMsg trackR = {102, 0};
+   defMidiMsg shift = {108, 0};
   
 
 	 //MIDI status bytes
@@ -43,8 +48,12 @@ struct defLaunchkey{
 	 const byte PAD_OFF = 135;
 	 const byte PITCHBEND = 224; 
 	 const byte CC = 176;
+   const byte CC16 = 176;
 
   //message to switch launchkey to control mode
   //this is necessary to be able to control the LEDs
   const byte controlMode[3] = {159, 12, 127}; //status (note on chan16), note#, velocity)
 };
+
+defLaunchkey key2;
+

@@ -117,7 +117,7 @@ void processCC(byte num, byte val) {
     byte recall_bank = 1;
     for(byte i=0;i<4;i++) preset_bank = lp.ctlY[i].val > 0 ? i+1 : preset_bank;
 
-    USBmessage(lp.CC, cur_preset + lp.ctlX[0].num,  0);
+    bufferLED(lp.CC, cur_preset + lp.ctlX[0].num,  0);
 
     if(preset_bank > 0){
       writePreset(num  + (preset_bank-1)*4);
@@ -130,12 +130,12 @@ void processCC(byte num, byte val) {
       lcd_string("read preset  ", 0,0);
       lcd_printMIDI(num  + (recall_bank-1)*4);
     }
-    USBmessage(lp.CC, cur_preset + lp.ctlX[0].num,  51);
+    bufferLED(lp.CC, cur_preset + lp.ctlX[0].num,  51);
   } //presets
   else if(num < 8){
-    USBmessage(lp.CC, launchpad_page + lp.ctlX[0].num + 4,  0);
+    bufferLED(lp.CC, launchpad_page + lp.ctlX[0].num + 4,  0);
     launchpad_page = num - 4;
     updateGrid();
-    USBmessage(lp.CC, launchpad_page + lp.ctlX[0].num + 4,  48);
+    bufferLED(lp.CC, launchpad_page + lp.ctlX[0].num + 4,  48);
   }
 }

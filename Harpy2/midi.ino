@@ -8,11 +8,11 @@ void MIDI_poll()
   if (Midi.RecvData( &rcvd,  bufMidi) == 0 ) {
     if( bufMidi[1] == 144 ){ //note on channel 1
       sprintf(buf, " %s %d %d %d", "NOTEON 1", bufMidi[1], bufMidi[2], bufMidi[0]);
-      Serial.println(buf);
+      //Serial.println(buf);
       cur_note_prev = cur_note;
       cur_note = bufMidi[2];
       keys_down = keys_down < 2 ? keys_down + 1: 2;
-      Serial.println(keys_down);
+      //Serial.println(keys_down);
     } 
     
     else if( bufMidi[1] == 153 ){ //note on channel 10
@@ -22,7 +22,7 @@ void MIDI_poll()
     else if( bufMidi[1] == 128 ){ //note off
       sprintf(buf, " %s %d %d %d", "NOTEOFF 1", bufMidi[1],bufMidi[2], bufMidi[0]);
       keys_down = keys_down > 0 ? keys_down - 1: 0;
-      Serial.println(keys_down);
+      //Serial.println(keys_down);
     } 
     else if( bufMidi[1] == 137 ){ //note off
       //sprintf(buf, " %s %d %d %d", "NOTEOFF 10", bufMidi[1],bufMidi[2], bufMidi[0]);
@@ -31,7 +31,10 @@ void MIDI_poll()
     else if( bufMidi[1] == 176 ){ //cc
       sprintf(buf, " %s %d %d", "CC", bufMidi[1], bufMidi[2], bufMidi[3]);
       processCC(bufMidi[2], bufMidi[3]);
-    }else if( bufMidi[1] == 224 ){ //pitchbend
+    } else if( bufMidi[1] == 191 ){ //cc
+      sprintf(buf, " %s %d %d", "CC", bufMidi[1], bufMidi[2], bufMidi[3]);
+      processCC(bufMidi[2], bufMidi[3]);
+    } else if( bufMidi[1] == 224 ){ //pitchbend
       sprintf(buf, " %s %d %d", "pitchbend", bufMidi[1], bufMidi[2], bufMidi[3]);
       //processCC(bufMidi[2], bufMidi[3]);
     } 
@@ -69,7 +72,7 @@ void USBmessage(byte command, byte MIDInote, byte MIDIvelocity){
 void USBmessage2(byte command, byte MIDInote, byte MIDIvelocity){
   byte msg[] = {command, MIDInote, MIDIvelocity};
   Midi.SendData(msg,1);
-  Serial.println("USB2 " + String(command) + " " + String(MIDInote) + " " + String(MIDIvelocity));
+  //Serial.println("USB2 " + String(command) + " " + String(MIDInote) + " " + String(MIDIvelocity));
 }
 
 // void USBmessage(byte command, byte MIDInote, byte MIDIvelocity, byte port = 1){

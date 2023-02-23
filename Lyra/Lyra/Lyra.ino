@@ -13,12 +13,13 @@
 const byte clockPin = 2;
 const byte resetPin = 4;
 
-const byte SERIAL_DEBUG = 1;
+const byte SERIAL_DEBUG = 0;
 uint32_t test_timer = 0;
 
 /*
  *******************************************************************************
- Leonard MIDI sequencer
+ Lyra MIDI sequencer
+ - a fork of Leonard for the Launchpad v3 and the Dreadbox Dysmetria
  based on the controlVoltage arduino library
  initial creation by Ian Hattwick 2023
  for FaMLE (the MIT laptop ensemble)
@@ -27,6 +28,8 @@ uint32_t test_timer = 0;
  this example designed to use an Arturia launchpad mini Mk2 to sequence a niftyCase in drum mode
  - e.g. midi channel 10 to niftcase turns the 5 outputs into trigger outputs
  - maybe it could be 4 trigger outputs on channel 10, plus mod out on channel 1?
+ - the length of all gates is equal to 1/2 of their step length
+ - maybe this would be good to be a parameter to edit?
 
   To do:
  - update LED updates for enable, divide, and patternSquence (top 4 rows) when preset is changed
@@ -34,7 +37,7 @@ uint32_t test_timer = 0;
  - add cursors on pattern grouping rows to indicate which pattern is playing
  - enable toggling a pattern on/off, allowing for pattern rests
   *  e.g. tapping a pattern grouping button twice disables that pattern, so the sequence doesn't play for that 8 beats
- - figure out why clock multipler causes timing glitches (so we can use it)
+ - (fixed) figure out why clock multipler causes timing glitches (so we can use it)
  - implement mod wheel functionality
   * maybe have ctlX[7] switch to mod mode?
   * enable using grid as sliders for setting mod value
@@ -121,7 +124,7 @@ void onInit()
   //lcd.println("connected"); 
   lcd.setCursor(0,1);
   //lcd.print("midi sequencer");  
-  lcd.write(0);  
+  //lcd.write(0);  
    delay(500);
   lcd.clear();
 
@@ -137,8 +140,9 @@ void onInit()
       updateGridLed(i*4 + (i>1)*8 + 8 + j, 1, patternColor[i]);
     }
   }
-  lcd_string("leonard seq",0, 0);
-}//usb init
+  char name[] = "lyra sequencer";
+  lcd_string(name,0, 0);
+}
 
 void setup()
 {

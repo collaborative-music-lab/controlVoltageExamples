@@ -6,11 +6,17 @@
 #include <controlVoltage.h>
 #include "launchkey.h"
 #include "niftyCase.h"
+#include "setup.h"
+#include <EEPROM.h>
+
 
 const byte SERIAL_DEBUG = 1;
 
 const byte clockPin = 2;
 const byte resetPin = 4;
+
+const char INSTRUMENT_DEFINITION = "Harpy v2.0";
+
 /*
  *******************************************************************************
 HARPY MIDI sequencer
@@ -69,71 +75,13 @@ To Do:
  *******************************************************************************
  */
 
-//LCD Display
-LiquidCrystal_I2C lcd(0x23F,16,2);  // set the LCD address to 0x27 for a 16 chars and 2 line display
-
-//controlVoltage
-controlVoltage mod; //mod signal
-
-const byte SEQ_LENGTH = 16;
-
-Sequencer8bit<SEQ_LENGTH> seq[2];
-
-byte seqEnable = 3; //bits control enable
-
-byte cur_chan = 1;
-byte keys_down = 0;
-byte cur_note = 60;
-byte cur_note_prev = 60; //might be interesting to keep track of last two notes pressed?
-byte prev_note[2];
-
-//keeping track of indexes
-byte main_index = 0;
-byte seqIndex[2];
-byte freeze_index = 0;
-byte freeze_length = 4;
-//subdividers
-byte seqDivide[2];
-char globalDivide = 0;
-byte globalRotate = 0;
-byte globalStop = 0;
-byte globalRepeat = 0;
-
-//clock parameters
-//subdiv multiples clock input
-uint8_t subdiv = 0;
-uint8_t num_subdiv = 4; //must be 1 or greater
-
-//USB Host
-USB Usb;
-USBHub Hub(&Usb);
-USBH_MIDI  Midi(&Usb);
-
-defLaunchkey key;
-defNifty nifty;
-
-//MIDI output
-SoftwareSerial MIDI(14, 5); // RX, TX
-
-void MIDI_poll();
-
-//Sequencer
-uint32_t tempo = 100;
-
 void onInit()
 {
-//  char buf[20];
-//  uint16_t vid = Midi.idVendor();
-//  uint16_t pid = Midi.idProduct();
-//  sprintf(buf, "VID:%04X, PID:%04X", vid, pid);
-//  Serial.println(buf); 
+  delay(250);
+  lcd.clear();
+  delay(250);
+  lcd_string(INSTRUMENT_DEFINITION, 0,0);
 
-  delay(1000);
-
-  // for(int i=0;i<127;i++) {
-  //   USBmessage2(key.KEY_ON, i, 5);
-  //   delay(1);
-  // }
   USBmessage2(key.controlMode[0], key.controlMode[1], key.controlMode[2]);
 }
 
@@ -169,11 +117,7 @@ void setup()
 
   //scanI2C();
 
-  for(byte i=0;i<SEQ_LENGTH;i++){
-    seq[0].setAux(0, i, 1 );
-    //seq[1].setAux(0, i, 1 );
-  }
-
+  seq[0]._aux[0] = 0;
 }
 
 void loop()

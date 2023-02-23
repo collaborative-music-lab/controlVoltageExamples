@@ -24,14 +24,10 @@ void processCC(byte num, byte val){
 }
 
 void handleButtons(byte num, byte val){
-  if (num == key.arrow.num){
-    key.arrow.val = val;
-    if(val>0) cur_chan = key.stop.val > 0 ? 3 : 1;
-    Serial.println("chan " + String(cur_chan));
-  } else if (num == key.stop.num){
-    key.stop.val = val;
-    if(val>0) cur_chan = key.arrow.val > 0 ? 3 : 2;
-    Serial.println("chan " + String(cur_chan));
+  switch(num){
+    case key.arrow.num:  if(val>0) cur_chan = key.stop.val > 0 ? 3 : 1; break;
+    case key.stop.num: key.stop.val = val; if(val>0) cur_chan = key.arrow.val > 0 ? 3 : 2; break;
+    case key.rec.num: key.rec.val = val; break;
   }
 }
 

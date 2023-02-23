@@ -1,5 +1,5 @@
 //LCD Display
-Mini_LiquidCrystal_I2C lcd(0x3F,16,2);  // set the LCD address to 0x27 for a 16 chars and 2 line display
+Mini_LiquidCrystal_I2C lcd(0x27,16,2);  // set the LCD address to 0x27 for a 16 chars and 2 line display
 
 //Seqeuncer definition
 const byte NUM_SEQS = 1;
@@ -17,10 +17,10 @@ defParams params;
 
 //keeping track of indexes
 byte main_index = 0;
-byte freeze_index = 0;
+uint32_t freeze_index = 0;
 byte freeze_length = 4;
 //subdividers
-char globalDivide = 0;
+byte globalDivide = 0;
 byte globalRotate = 0;
 byte globalStop = 0;
 byte globalRepeat = 0;
