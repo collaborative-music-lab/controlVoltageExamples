@@ -13,7 +13,7 @@
 const byte clockPin = 2;
 const byte resetPin = 4;
 
-const byte SERIAL_DEBUG = 1;
+const byte SERIAL_DEBUG = 0;
 
 /*
  *******************************************************************************
@@ -136,7 +136,10 @@ byte globalRepeat = 0;
 //subdiv multiples clock input
 uint16_t subdiv_interval;
 uint8_t subdiv = 0;
-uint8_t num_subdiv = 4; //must be 1 or greater
+uint8_t num_subdiv = 2; //must be 1 or greater
+uint16_t beat_length = 150;
+uint8_t reset_flag = 0;
+uint8_t clock_state = 0;
 
 //selecting sequences to edit
 byte drum=7;

@@ -3,10 +3,10 @@ void lcd_print(char num){
 }
 
 void lcd_print_subdiv(byte chan){
-  
   lcd.setCursor(3,chan);
-  if( chan == 0 ) lcd.write(  seqChanADivide[drum] + 48 );
-  else lcd.write(  seqChanBDivide[drum] + 48 );
+  byte val = chan==0 ? seqChanADivide[drum] : seqChanBDivide[drum];
+  if (val > 8) val = val/8;
+  lcd.write(  val + 48 );
 }
 
 void lcd_printGains(){

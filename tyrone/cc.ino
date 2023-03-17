@@ -40,7 +40,7 @@ void selectSequence(byte num){
   }
   
   //select drum sequence or global
-  byte temp = GLOBAL;
+  byte temp = 0;
   lcd.setCursor(0,0);
   switch(num-nano.r1){
     case 0: temp=0; lcd.write('k'); break;
@@ -110,7 +110,25 @@ void handleFaders(byte num, byte val){
 void handleDials(byte num, byte val){
   //dials set the velocity for SEQ A&B
   num = num - nano.dial1;
-  
+
+  val = 127-val;
+
+  uint32_t calc = 0;
+  if(val>64) {
+    calc = 64-val;
+    calc = calc*calc;
+    calc = 64 - calc/64;
+    val = (byte)calc;
+  } else{
+    calc = val-64;
+    calc = calc*calc;
+    calc = 64 + calc/64;
+    val = (byte)calc;
+  }
+
+  //set broad bins for min/max value
+  val = val < 7 ? 0 : val>120 ? 127 : val;
+
   if(num < NUM_SEQS) {
     if(num<6){ //drum voices
       if(val<64){
@@ -173,21 +191,25 @@ void handleTransport(byte num, byte val){
   }
   
   //change subdivide
-  else if(num == nano.trackL.num && val>0) incStepSize(seqdrum,1);
-  else if(num == nano.trackR.num && val>0) incStepSize(seqdrum,-1);
+  else if(num == nano.trackL.num && val>0 && drum < 7) incStepSize(seqdrum,1);
+  else if(num == nano.trackR.num && val>0 && drum < 7) incStepSize(seqdrum,-1);
 }
 
 void incStepSize(byte num, char inc){
-  seq[num].subDivide += inc;
+  if(seq[num].subDivide > 8) seq[num].subDivide += inc*4;
+  else seq[num].subDivide += inc;
   seq[num].subDivide = seq[num].subDivide < 1 ? 1 : seq[num].subDivide;
 
   if( seqchan == 0 ) {
     seqChanADivide[drum] += inc;
     if( seqChanADivide[drum] < 1 ) seqChanADivide[drum] = 1;
+    else if( seqChanADivide[drum] > 8 ) seqChanADivide[drum] = 8;
   }
   else {
     seqChanBDivide[drum] += inc;
     if( seqChanBDivide[drum] < 1 ) seqChanBDivide[drum] = 1;
+    else if( seqChanBDivide[drum] > 8 ) seqChanBDivide[drum] = 8;
   }
   lcd_print_subdiv(seqchan);
+  Serial.println(String( seqChanADivide[drum]) + " " + String(seqChanBDivide[drum]));
 }

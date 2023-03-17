@@ -1,7 +1,12 @@
 void Sequencer(){
   //increment main index - rolls over at 256 right now
   static byte cur_index = 0;
-  main_index += 1;
+  if(reset_flag){
+    main_index = 0;
+    reset_flag = 0;
+  }
+  else main_index += 1;
+  
   cur_index = globalRepeat == 0 ? main_index : freeze_index + (main_index-freeze_index) % freeze_length;
   if( SERIAL_DEBUG ) if(globalRepeat) Serial.println(String(freeze_index) + " " + String(cur_index));
   if(globalStop == 1) return 0;
@@ -30,8 +35,8 @@ void Sequencer(){
     
     //check if a step is active
     //taking into account the subdivision
-    byte valA = rotate(cur_index,globalRotate,8) %SEQ_LENGTH % getDivide(0,i) > 0 ? 0 : seq[i].getAux(0,indexA);
-    byte valB = rotate(cur_index,globalRotate,8) %SEQ_LENGTH % getDivide(1,i)> 0 ? 0 : seq[i].getAux(1,indexB);
+    byte valA = rotate(cur_index,globalRotate,8)  % getDivide(0,i) > 0 ? 0 : seq[i].getAux(0,indexA);
+    byte valB = rotate(cur_index,globalRotate,8)  % getDivide(1,i)> 0 ? 0 : seq[i].getAux(1,indexB);
     if(((seqEnable[0] >> i) & 1) == 0) valA = 0;
     if(((seqEnable[1] >> i) & 1) == 0) valB = 0;
 
@@ -48,17 +53,21 @@ void Sequencer(){
       if( (valB > 0) && (bassGain[1] > vel)) vel = bassGain[1];
       
       if(vel >0) {
+        Serial.print(String(bassGain[0]) + " " + String(bassGain[1]) + " ");
+        Serial.println(vel);
         //calculate pitch
         const byte scale[] = {0,2,3,5,7,8,10};
         MIDImessage( bassON, curNote, 0 );
   
         byte pitch = 0;
-        if(seq[i].getAux(0,indexA) == 1) pitch += (seq[6].get(indexA)/18 + 1);
-        if(seq[i].getAux(1,indexB) == 1) pitch += (seq[6].get(indexB)/18 + 1);
+        if(seq[6].getAux(0,indexA) && (((seqEnable[0] >> i) & 1) == 1) ) pitch += (seq[6].get(indexA)/18 );
+        if(seq[6].getAux(0,indexB) && (((seqEnable[1] >> i) & 1) == 1) ) {
+          pitch += (seq[6].get(indexB)/18 );
+          
+        }
         curNote = scale[pitch % sizeof(scale)] + (pitch / sizeof(scale))*12 + pitchOffset;
-  
-        MIDImessage( bassON, curNote, vel>1?vel:0 );    
-        lcd_printNOTE(curNote);
+        MIDImessage( bassON, curNote, vel>20?vel:0 );    
+        //lcd_printNOTE(curNote);
       }
     }
 
