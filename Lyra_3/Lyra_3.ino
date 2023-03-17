@@ -17,7 +17,7 @@ const byte SERIAL_DEBUG = 1;
 uint32_t test_timer = 0;
 
 char name[] = "lyra sequencer";
- char version_num[] = "v. 2.1";
+ char version_num[] = "v. 3.0";
 
 /*
  *******************************************************************************
@@ -32,6 +32,8 @@ char name[] = "lyra sequencer";
  - added buffering for LED msgs
  - changed buffering of output MIDI msgs for better performance
  - all outputs are now gates for the full length of the subdivision
+ v3.0
+ - adds support for midi clock, mod output, and piutch CV output
 
   takes input from a midi device and creates a sequence
  this example designed to use an Arturia launchpad mini Mk2 to sequence a niftyCase in drum mode
