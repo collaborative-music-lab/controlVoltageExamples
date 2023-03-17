@@ -25,7 +25,7 @@ uint32_t test_timer = 0;
 
   takes input from a midi device and creates a sequence
  this example designed to use an Arturia launchpad mini Mk2 to sequence a niftyCase in drum mode
- - e.g. midi channel 10 to niftcase turns the 5 outputs into trigger outputs
+ - e.g. midi channel 10 to niftycase turns the 5 outputs into trigger outputs
  - maybe it could be 4 trigger outputs on channel 10, plus mod out on channel 1?
 
  v1.0 initial
@@ -104,6 +104,7 @@ Ardunio pinout (verify):
  *******************************************************************************
  */
 
+char name[] = "leonard seque";
  char version_num[] = "v. 2.0";
 
 
@@ -143,7 +144,7 @@ void onInit()
       updateGridLed(i*4 + (i>1)*8 + 8 + j, 1, patternColor[i]);
     }
   }
-  lcd_string("leonard seq",0, 0);
+  lcd_string(name,0, 0);
   lcd_string(version_num,0, 1);
 }//usb init
 
@@ -191,6 +192,8 @@ void setup()
   if( SERIAL_DEBUG ) Serial.println("setup complete");
 
   eepromSetup();
+
+  for(int i=0;i<4;i++) params.seqTiming[i] = 0;
 
 }
 

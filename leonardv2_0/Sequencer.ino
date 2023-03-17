@@ -1,6 +1,11 @@
 void Sequencer(){
   //increment main index - rolls over at 256 right now
-  main_index += 1;
+   if(reset_flag){
+    main_index = 0;
+    reset_flag = 0;
+  }
+  else main_index += 1;
+
   //cur_index allows for manipulation of global parameters like freeze and beat repeat without affecting main_index count
   static byte cur_index = 0;
   cur_index = globalRepeat == 0 ? main_index : freeze_index + (main_index-freeze_index) % freeze_length;

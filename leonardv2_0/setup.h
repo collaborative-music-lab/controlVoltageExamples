@@ -12,6 +12,7 @@ struct defParams{
   byte seqEnable[4] = {127,127,127,127};
   byte seqSelect[4][4];
   byte seqDivide[4];
+  byte seqTiming[4] = {0,0,0,0};
 };
 defParams params;
 

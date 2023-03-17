@@ -76,5 +76,7 @@ void clockLoop(){
 
   if(resetState == bRISING) {
     if( SERIAL_DEBUG ) Serial.println("reset rising");
+    reset_flag = 1;
+    if(clockState == bRISING || clockState == bHIGH) Sequencer();
   }
 }
