@@ -56,12 +56,16 @@ void handleDials(byte num, byte val){
     lcd_string("startA  ", 0,0); lcd_printMIDI( params.seqStart[0] );
     } else if(num==2 && params.seqEnd[0] != (val/8)*2+1){ params.seqEnd[0] = (val/8)*2+1; 
     lcd_string("endA    ", 0,0); lcd_printMIDI( params.seqEnd[0] );
-    } else if(num==4 && params.seqDivide[1] != _divide[val/13]){ params.seqDivide[1] = _divide[val/13]; 
+    } else if(num==3 && params.transpose[0] != char(val/9)-7){ params.transpose[0] = char(val/9)-7; 
+    lcd_string("transpA ", 0,0); lcd_printMIDI( params.transpose[0] );
+    }else if(num==4 && params.seqDivide[1] != _divide[val/13]){ params.seqDivide[1] = _divide[val/13]; 
     lcd_string("divideB ", 0,1); lcd_printMIDI( params.seqDivide[1] );
     } else if(num==5 && params.seqStart[1] != (val/8)*2){ params.seqStart[1] = (val/8)*2; 
     lcd_string("startB  ", 0,1); lcd_printMIDI( params.seqStart[1] );
-    } else if(num==6 && params.seqEnd[1] != (val/8)*2+1){ params.seqEnd[1] = (val/8)*2+1; 
+    } else if(num==6 && params.seqEnd[1] != (val/9)*2+1){ params.seqEnd[1] = (val/8)*2+1; 
     lcd_string("endB    ", 0,1); lcd_printMIDI( params.seqEnd[1] );
+    } else if(num==7 && params.transpose[1] != char(val/9)-7){ params.transpose[1] = char(val/9)-7; 
+    lcd_string("transpB ", 0,1); lcd_printMIDI( params.transpose[1] );
     }
 }
 

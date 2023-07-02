@@ -1,14 +1,31 @@
 void Sequencer(){
+
+
+  //updates indexes for both voices
+  static byte subIndex[2];
+  byte seqNewStep[2];
+  
+  
   //increment main index - rolls over at 256 right now
+   if(reset_flag){
+    main_index = 0;
+    reset_flag = 0;
+    subIndex[0] = 0;
+    subIndex[1] = 0;
+    params.index[0] = params.seqStart[0];
+    params.index[1] = params.seqStart[1];
+  }
+  else main_index += 1;
+  static long test_timer = 0;
+  //Serial.println("sequence " + String(subIndex[0]) + " " + String(millis()-test_timer));
+  test_timer = millis();
+
   static byte cur_index = 0;
-  main_index += 1;
   cur_index = globalRepeat == 0 ? main_index : freeze_index + (main_index-freeze_index) % freeze_length;
   if( SERIAL_DEBUG ) if(globalRepeat) Serial.println(String(freeze_index) + " " + String(cur_index));
   if(globalStop == 1) return 0;
   
-  //updates indexes for both voices
-  static byte subIndex[2];
-  byte seqNewStep[2];
+  
   for(byte i=0;i<2;i++){
     //byte valA = rotate(indexA,globalRotate)  % getDivide(i) > 0 ? 0 : seq[0].getAux(0,indexA);
     if( subIndex[i] % getDivide(i) == 0 ){
@@ -85,10 +102,23 @@ void Sequencer(){
       //without hanging the niftycase
       static byte prev_note[2];
       if(valA > 0 ) {
+        char cur_note = seq[0].get(indexA);
+        const byte major_scale[] = {0,1,1,2, 2,3,4, 4,5,5,6,6};
+        const byte major_scale2[] = {0,2,4,5,7,9,11};
+        if(params.transpose[i] != 0) {
+          byte transposition = major_scale[cur_note%12] + (cur_note/12)*7 + params.transpose[i];
+          cur_note = major_scale2[transposition %7] + (transposition/7)*12;
+          Serial.println("tranpose " + String(transposition));
+        }
         //MIDImessage( nifty.NOTE_ON[i], seq[i].get(ledIndex[i]), 0 );
-        if( prev_note[i] < 255) MIDImessage( nifty.NOTE_ON[i], prev_note[i], 0 );
-        scheduleNoteOff( nifty.NOTE_ON[i], seq[0].get(indexA), 127, 2); 
-        prev_note[i] = seq[0].get(indexA);
+        MIDImessage( nifty.NOTE_ON[i], cur_note, 127 );
+        //scheduleNoteOff( nifty.DRUM_ON, nifty.drum[i], 0, 5); 
+        scheduleNoteOff( nifty.NOTE_ON[i], cur_note, 0, (beat_length/num_subdiv * params.seqDivide[i])/2); 
+
+        // if( prev_note[i] < 255) MIDImessage( nifty.NOTE_ON[i], prev_note[i], 0 ); //noteoff
+        // scheduleNoteOff( nifty.NOTE_ON[i], seq[0].get(indexA), 127, 2); //noteon
+        // prev_note[i] = seq[0].get(indexA); 
+
       } else  {
           if( prev_note[i] < 255) MIDImessage( nifty.NOTE_ON[i],prev_note[i], 0 );
           prev_note[i] = 255;

@@ -10,9 +10,26 @@ void clockSetup(){
 }
 
 void clockLoop(){
+
+  /***** reset *****/
+  byte val = !digitalRead( resetPin );
+  switch( resetState ){
+    case bOFF: resetState = val == 1 ? bRISING : bFALLING; break;
+    case bLOW: resetState = val == 1 ? bRISING : bLOW; break;
+    case bFALLING: resetState = val == 1 ? bRISING : bLOW; break;
+    case bHIGH: resetState = val == 1 ? bHIGH : bFALLING; break;
+    case bRISING: resetState = val == 1 ? bHIGH : bFALLING; break;
+  }
+
+  if(resetState == bRISING) {
+    if( SERIAL_DEBUG ) Serial.println("reset rising");
+    reset_flag = 1;
+    if(clockState == bRISING || clockState == bHIGH) Sequencer();
+  }
+
   /*****external clock*****/
   static byte clock_mode = 1; //0 for external, 1 for internal
-  byte val = !digitalRead( clockPin );
+  val = !digitalRead( clockPin );
   if(val == 1) clock_mode = 0;
 
   switch( clockState ){
@@ -23,18 +40,11 @@ void clockLoop(){
     case bRISING: clockState = val == 1 ? bHIGH : bFALLING; break;
   }
 
-  val = !digitalRead( resetPin );
-  switch( resetState ){
-    case bOFF: resetState = val == 1 ? bRISING : bFALLING; break;
-    case bLOW: resetState = val == 1 ? bRISING : bLOW; break;
-    case bFALLING: resetState = val == 1 ? bRISING : bLOW; break;
-    case bHIGH: resetState = val == 1 ? bHIGH : bFALLING; break;
-    case bRISING: resetState = val == 1 ? bHIGH : bFALLING; break;
-  }
+  
 
   /*****internal clock*****/
   static uint32_t control_timer = 0;
-  int interval = 450;
+  int interval = 150;
   
   if((millis()-control_timer > interval) && clock_mode > 0){
     //subdiv_interval = (millis()-control_timer)/(num_subdiv);
@@ -51,7 +61,8 @@ void clockLoop(){
   static uint32_t prevClock = millis();
 
   if(clockState == bRISING) {
-    subdiv_interval = (millis()-control_timer)/num_subdiv;
+    beat_length = millis()-control_timer;
+    subdiv_interval = beat_length/num_subdiv;
     control_timer=millis();
     // Serial.println(millis()-test_timer); 
     // test_timer = millis();
@@ -73,7 +84,4 @@ void clockLoop(){
     }
   }
 
-  if(resetState == bRISING) {
-    if( SERIAL_DEBUG ) Serial.println("reset rising");
-  }
 }

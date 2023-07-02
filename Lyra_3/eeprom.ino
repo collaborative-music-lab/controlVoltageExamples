@@ -2,10 +2,9 @@
  * Data stored in EEPROM:
  * 
 
- params struct //24 bytes
+ params struct //44 bytes
  seq[0].aux 0-3 //4 bytes
- seq[0].val //8 bytes
- mod_vals //8 bytes
+
 
  sequences are stored at increments of 50
 

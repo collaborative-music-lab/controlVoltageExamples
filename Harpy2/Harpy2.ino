@@ -77,12 +77,10 @@ To Do:
 
 void onInit()
 {
-  delay(250);
   lcd.clear();
-  delay(250);
   lcd_string(INSTRUMENT_DEFINITION, 0,0);
 
-  USBmessage2(key.controlMode[0], key.controlMode[1], key.controlMode[2]);
+  USBmessage2(key.controlMode[0], key.controlMode[1], key.controlMode[2]); //enable mode for controlling leds
 }
 
 void setup()

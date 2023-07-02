@@ -44,8 +44,8 @@ void handleGrid(byte num, byte val){
   //convert note nums to 0-63
   num = num - (8* (num/16));
 
-  if( launchpad_page == 1) {
-    updateModVals(num, val);
+  if( launchpad_page > 0) {
+    updateModPitchVals(num, val);
     return 0;
   };
   
@@ -80,11 +80,15 @@ void handleGrid(byte num, byte val){
   }
 }
 
-void updateModVals(byte num, byte val){
+void updateModPitchVals(byte num, byte val){
   byte row = 7 - (num / 8);
   byte col = num % 8;
-  params.mod_vals[col] = row * 18;
-  Serial.println(String(col) + " " + String(row));
+
+  if( launchpad_page == 1) params.mod_vals[col] = row * 18;
+  else if( launchpad_page == 2) {
+    byte pentatonic[] = {7,10,12,15,17,19,22,24};
+    //params.pitch_vals[col] = 12 + pentatonic[row];
+  }
 }
 
 void setPatternDivide(byte num, byte val){

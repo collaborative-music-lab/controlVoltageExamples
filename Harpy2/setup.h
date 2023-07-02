@@ -1,13 +1,14 @@
 struct defParams{
   byte seqLength[2] = {32,32};
   byte seqOffset[2] = {0,0};
-  byte seqDivide[2] = {2,2};
+  byte seqDivide[2] = {4,4};
   byte seqMode[2] = {0,0};
   byte seqStart[2] = {0,16};
   byte seqEnd[2] = {15,31};
   byte index[2];
   byte inc[2] = {1,1};
   byte resetCondition[2] = {0,1}; //0=external, 1=other sequence
+  char transpose[2] = {0,0};
 };
 defParams params;
 
@@ -42,6 +43,8 @@ char globalDivide = 0;
 byte globalRotate = 0;
 byte globalStop = 0;
 byte globalRepeat = 0;
+uint16_t beat_length = 150;
+byte reset_flag = 0;
 
 //clock parameters
 //subdiv multiples clock input

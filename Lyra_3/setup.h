@@ -14,6 +14,7 @@ struct defParams{
   byte seqDivide[4];
   byte seqTiming[4] = {0,0,0,0};
   byte mod_vals[8];
+  //byte pitch_vals[8];
 };
 defParams params;
 

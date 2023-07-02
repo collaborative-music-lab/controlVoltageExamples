@@ -56,13 +56,13 @@ https://docs.arduino.cc/learn/built-in-libraries/eeprom
     EEPROM.put( address, seq[0].val );
     EEPROM.put( address + sizeof(seq[0].val), seq[0]._aux );
     lcd_printMIDI(num);
-    lcd_string(":wrote pitch", 3,0);
+    // lcd_string(":wrote pitch", 3,0);
     cur_pitch_preset = num;
    } else {
     int address = num < 16 ? (num-8) * 20 + 400 : 400;
     EEPROM.put( address, params );
-    lcd_printMIDI(num-8);
-    lcd_string(":wrote seq", 3,1);
+    // lcd_printMIDI(num-8);
+    // lcd_string(":wrote seq", 3,1);
     cur_seq_preset = num-8;
    }
  }
