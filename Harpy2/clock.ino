@@ -45,6 +45,8 @@ void clockLoop(){
   /*****internal clock*****/
   static uint32_t control_timer = 0;
   int interval = 150;
+  int midi_clock_interval = interval / 3;
+  byte midi_beat = 0;
   
   if((millis()-control_timer > interval) && clock_mode > 0){
     //subdiv_interval = (millis()-control_timer)/(num_subdiv);
@@ -59,6 +61,7 @@ void clockLoop(){
   /*****all clock*****/
   static uint16_t subdiv_interval;
   static uint32_t prevClock = millis();
+  static uint32_t prev_midi_clock = 0;
 
   if(clockState == bRISING) {
     beat_length = millis()-control_timer;
@@ -66,6 +69,10 @@ void clockLoop(){
     control_timer=millis();
     // Serial.println(millis()-test_timer); 
     // test_timer = millis();
+
+    prev_midi_clock = millis();
+    midi_beat = 0;
+    MIDI.write(250);
     
     subdiv = 1;
     Sequencer();
@@ -82,6 +89,9 @@ void clockLoop(){
       Sequencer();
       Serial.print(".");
     }
+  } else if ((midi_beat <3) && (millis()-prev_midi_clock > midi_clock_interval)){
+    prev_midi_clock = millis();
+    midi_beat +=  1;
+    MIDI.write(250);
   }
-
 }
