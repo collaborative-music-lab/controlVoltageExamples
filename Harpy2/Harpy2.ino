@@ -116,6 +116,11 @@ void setup()
   //scanI2C();
 
   seq[0]._aux[0] = 0;
+
+  params.seqDivide[0] = 1;
+
+  params.seqDivide[1] = 1;
+
 }
 
 void loop()

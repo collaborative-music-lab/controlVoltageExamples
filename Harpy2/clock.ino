@@ -80,13 +80,17 @@ void clockLoop(){
     // MIDImessage( nifty.DRUM_ON, 36+pitch*12, 0 ); 
     // pitch = pitch>3?0:pitch+1;
     // MIDImessage( nifty.DRUM_ON, 36+pitch*12, 100 );
+
+    if(main_index%4 > 0){
+      main_index = (main_index/4)*4;
+    }
      
     Serial.print("*");
     //Serial.println(subdiv_interval);
   } else if(subdiv< num_subdiv){
     if(millis() - control_timer > subdiv_interval*subdiv){
       subdiv = subdiv+1;
-      Sequencer();
+     // Sequencer();
       Serial.print(".");
     }
   } else if ((midi_beat <3) && (millis()-prev_midi_clock > midi_clock_interval)){

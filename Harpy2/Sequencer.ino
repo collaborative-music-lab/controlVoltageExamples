@@ -15,7 +15,8 @@ void Sequencer(){
     params.index[0] = params.seqStart[0];
     params.index[1] = params.seqStart[1];
   }
-  else main_index += 1;
+  //main main_index increment at end of function
+
   static long test_timer = 0;
   //Serial.println("sequence " + String(subIndex[0]) + " " + String(millis()-test_timer));
   test_timer = millis();
@@ -136,6 +137,7 @@ void Sequencer(){
       else if( i==1 ) LK_LED_PAD(padNum % 16,  BLUE,  ON);
     }//if new step for this seq
   }// for all seqs
+  main_index += 1;
 }//sequencer
 
 /**************process note offs**********/
