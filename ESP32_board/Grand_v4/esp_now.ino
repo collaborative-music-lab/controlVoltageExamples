@@ -6,22 +6,12 @@ sentCallback() runs after a espnow msg is sent
 broadcast() sends a msg to all espnow devices on the network
 *********************************************/
 
-// Forward declaration of sendClock:
-void sendClock();
-
-
-void formatMacAddress(const uint8_t *macAddr, char *buffer, int maxLength);
-void receiveCallback(const uint8_t *macAddr, const uint8_t *data, int dataLen);
-//void sentCallback(const uint8_t *macAddr, esp_now_send_status_t status);
-//void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status);
-void broadcast(uint16_t count);
-
 void formatMacAddress(const uint8_t *macAddr, char *buffer, int maxLength)
 {
   snprintf(buffer, maxLength, "%02x:%02x:%02x:%02x:%02x:%02x", macAddr[0], macAddr[1], macAddr[2], macAddr[3], macAddr[4], macAddr[5]);
 }
 
-void receiveCallback(const uint8_t *macAddr, const uint8_t *data, int dataLen){
+void receiveCallback(const esp_now_recv_info *recvInfo, const uint8_t *data, int len) {
   
   // Serial.print("Received data as integers: ");
   // for (int i = 0; i < dataLen; i++) {
@@ -39,15 +29,15 @@ void receiveCallback(const uint8_t *macAddr, const uint8_t *data, int dataLen){
 }
 
 // callback when data is sent
-// void sentCallback(const uint8_t *macAddr, esp_now_send_status_t status)
-// {
-//   char macStr[18];
-//   formatMacAddress(macAddr, macStr, 18);
-//   // Serial.print("Last Packet Sent to: ");
-//   // Serial.println(macStr);
-//   // Serial.print("Last Packet Send Status: ");
-//   // Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
-// }
+void sentCallback(const uint8_t *macAddr, esp_now_send_status_t status)
+{
+  char macStr[18];
+  formatMacAddress(macAddr, macStr, 18);
+  // Serial.print("Last Packet Sent to: ");
+  // Serial.println(macStr);
+  // Serial.print("Last Packet Send Status: ");
+  // Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
+}
 
 void broadcast(uint16_t count) {
   // Define the broadcast MAC address

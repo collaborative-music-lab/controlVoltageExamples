@@ -5,8 +5,35 @@
 byte SERIAL_DEBUG = 0;
 byte IS_CLOCK_SOURCE = 1;
 
-#include <esp_now.h>
 #include "grand.h"
+#include <esp_now.h>
+
+/*********************************************
+INCLUDES
+*********************************************/
+// Create an instance for the MIDI output UART (using UART1).
+// Pin 5 will be used for TX. We are not using an RX, so set it to -1.
+HardwareSerial MidiSerial(1);
+void sendMidiClock();
+
+#include <esp32-hal-timer.h>
+//can't use Ticker.h because of need for microsecond precision
+hw_timer_t * mainClock = NULL; // Define a pointer to the timer
+hw_timer_t * mainClockRelease = NULL; // Define a pointer to the timer
+hw_timer_t * swingClock = NULL; // Define a pointer to the timer
+hw_timer_t * swingClockRelease = NULL; // Define a pointer to the timer
+//espnow
+//https://github.com/atomic14/ESPNowSimpleSample/blob/master/src/main.cpp
+#include <WiFi.h>
+// #include <esp_now.h>
+//custom
+
+#include "encoder.h"
+
+encoder enc(32,33,23,2);//A,B,Switch, Divider
+#include <Preferences.h>
+Preferences preferences;
+#include <Wire.h>
 
 /*********************************************
 MAIN
@@ -22,8 +49,7 @@ void setup() {
   pinMode( DAC_0, OUTPUT);
   pinMode( DAC_1, OUTPUT);
   pinMode(19, INPUT); //button
-  enc.begin([]{enc.readEncoder_ISR();});
-  attachInterrupt(digitalPinToInterrupt(19), ReadButton_ISR, CHANGE);
+  encoderSetup();
 
   MidiSerial.begin(31250, SERIAL_8N1, -1, MIDI_OUT);
 
@@ -116,5 +142,11 @@ void checkLed(){
       // digitalWrite( reset_out, LOW);
     }
   }
+}
+
+
+
+void sendMidiClock(){
+  MidiSerial.write(0xFE);
 }
 

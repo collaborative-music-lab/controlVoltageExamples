@@ -63,8 +63,14 @@
       36,
       40
     ],
-    "visible_layers": "80b100f_ffffffff",
+    "visible_layers": "808102f_ffffffff",
     "zone_display_mode": 0
+  },
+  "git": {
+    "repo_password": "",
+    "repo_type": "",
+    "repo_username": "",
+    "ssh_key": ""
   },
   "meta": {
     "filename": "Grand_central_pcb_simple.kicad_prl",

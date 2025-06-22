@@ -3,10 +3,6 @@ CLOCK.h
 
 *********************************************/
 
-void sendClock(uint32_t num);
-void triggerClock();
-void triggerReset();
-
 void sendClock(uint32_t num){
   //num is 0 for internal clock, the current beat number for external clock
   last_clock_receive_time = millis();
@@ -51,16 +47,20 @@ void triggerReset(){
   
 }
 
+void IRAM_ATTR onMainClock();  // forward declare
 //untested withpoint to function
 void setupTimer(hw_timer_t * _timer, void (*func)(), int bpm, int div){
   // Set up the hardware timer
   uint32_t interval = 60000/bpm;
   interval = (interval * 1000) / div;
   Serial.println("timer " + String( bpm ) + " " + String(interval));
-  _timer = timerBegin(0, 800, true); // Timer 0, 80 prescaler, count up
-  timerAttachInterrupt(_timer, func, true); // Attach the interrupt
-  timerAlarmWrite(_timer, interval/10, true); // Set alarm to trigger every 1000 microseconds
-  timerAlarmEnable(_timer); // Enable the alarm
+  // _timer = timerBegin(100000); // Timer 0, 80 prescaler, count up
+  // timerAttachInterrupt(_timer, func, true); // Attach the interrupt
+  // timerAlarmWrite(_timer, interval/10, true); // Set alarm to trigger every 1000 microseconds
+  // timerAlarmEnable(_timer); // Enable the alarm
+   _timer = timerBegin(1000000);  // Timer 0, divider 8 (10 microsecond tick)
+    timerAttachInterrupt(_timer, onMainClock, true);  // Attach callback function
+    timerAlarm(_timer,500000, true, 0);  // timer, count to call onTimer,
 }
 
 //TIMER ISRS
